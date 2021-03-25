@@ -12,11 +12,40 @@ export class UserListComponent implements OnInit {
 
   users$: Observable<User[]> = this.userService.getAll();
 
+  selectedUserToDelete: User = new User();
+
+  filterPhrase: string = '';
+  filterKey: string = 'name';
+  columnKey: string = '';
+  direction: number = 1;
+
   constructor(
     private userService: UserService,
   ) { }
 
   ngOnInit(): void {
+  }
+
+  setToDelete(user: User): void {
+    this.selectedUserToDelete = user;
+  }
+
+  deleteItem(): void {
+    this.userService.remove(this.selectedUserToDelete).subscribe(
+      () => {
+        this.users$ = this.userService.getAll();
+      }
+    );
+
+  }
+
+  onColumnSelect(key: string): void {
+    if (this.columnKey === key) {
+      this.direction = this.direction * -1;
+    } else {
+      this.direction = 1;
+    }
+    this.columnKey = key;
   }
 
 }

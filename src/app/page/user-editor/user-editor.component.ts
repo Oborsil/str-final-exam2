@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { User } from 'src/app/model/user';
@@ -20,7 +20,7 @@ export class UserEditorComponent implements OnInit {
    * 2. If the params.id isn't 0: a user from the database based on its id.
    */
   user$: Observable<User> = this.activatedRoute.params.pipe(
-    switchMap( params => {
+    switchMap(params => {
       if (Number(params.id) === 0) {
         return of(new User());
       }
@@ -29,12 +29,33 @@ export class UserEditorComponent implements OnInit {
     })
   );
 
+
+  emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
   constructor(
     private userService: UserService,
+    private router: Router,
     private activatedRoute: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
+  }
+
+  onFormSubmit(form: NgForm, user: User): void {
+    try {
+      if (user.id == 0) {
+        this.userService.create(user).subscribe(
+          () => this.router.navigate(['/'])
+        );
+      }
+      else {
+        this.userService.update(user).subscribe(
+          () => this.router.navigate(['/'])
+        );
+      }
+    } catch (error) {
+
+    }
   }
 
 }
